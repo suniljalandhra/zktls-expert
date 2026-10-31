@@ -1,12 +1,20 @@
+import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
+import './globals.css';
 import { Providers } from './providers';
 
-export const metadata = { title: 'zkTLS Expert', description: 'Prove GitHub expertise, get an EAS attestation' };
+const sans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600'] });
+const mono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400'], variable: '--font-mono' });
+
+export const metadata = {
+  title: 'Prove your GitHub expertise',
+  description: 'Verify a GitHub fact with a zkTLS proof and receive an EAS attestation.',
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 560, margin: '40px auto', padding: '0 16px' }}>
+    <html lang="en" className={`${sans.className} ${mono.variable}`}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>

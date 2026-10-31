@@ -1,30 +1,44 @@
 'use client';
 
-import { QRCodeSVG } from 'qrcode.react';
-import { useConnect, useConnection, useConnectors, useDisconnect } from 'wagmi';
+import { useEffect, useState } from 'react';
+import { useConnection } from 'wagmi';
+import { describeClaim } from './api';
+import { ConnectWallet, Mono, Result, Step, Verify, short, type Done, type Flow } from './steps';
 
-// Phase 0 placeholder: wallet connect works, QR renders. The Reclaim flow lands in Phase 1.
 export default function Home() {
   const { address, isConnected } = useConnection();
-  const connectors = useConnectors();
-  const { mutate: connect } = useConnect();
-  const { mutate: disconnect } = useDisconnect();
+  const [flow, setFlow] = useState<Flow>({ kind: 'idle' });
+
+  // A different wallet means a different claim: start over.
+  useEffect(() => setFlow({ kind: 'idle' }), [address]);
+
+  const done: Done | null =
+    flow.kind === 'waiting' && (flow.state.status === 'attested' || flow.state.status === 'verified')
+      ? flow.state
+      : null;
+  const step = !isConnected ? 1 : done ? 3 : 2;
 
   return (
-    <main>
-      <h1>zkTLS Expert</h1>
-      {isConnected ? (
+    <main className="page">
+      <header className="intro">
+        <h1>Prove your GitHub expertise</h1>
         <p>
-          Connected: <code>{address}</code> <button onClick={() => disconnect()}>Disconnect</button>
+          Sign in to GitHub through Reclaim. We check the proof and record the result on Sepolia as an attestation
+          to your wallet. Your GitHub password and session never reach us.
         </p>
-      ) : (
-        connectors.map((connector) => (
-          <button key={connector.uid} onClick={() => connect({ connector })}>
-            Connect {connector.name}
-          </button>
-        ))
-      )}
-      <QRCodeSVG value="https://example.com/reclaim-request-url" size={160} />
+      </header>
+
+      <ol className="steps">
+        <Step n={1} title="Connect your wallet" current={step} summary={address && <Mono>{short(address)}</Mono>}>
+          <ConnectWallet />
+        </Step>
+        <Step n={2} title="Verify with GitHub" current={step} summary={done && describeClaim(done.claim)}>
+          {address && <Verify wallet={address} flow={flow} setFlow={setFlow} />}
+        </Step>
+        <Step n={3} title="Your attestation" current={step}>
+          {done && address && <Result result={done} wallet={address} />}
+        </Step>
+      </ol>
     </main>
   );
 }
