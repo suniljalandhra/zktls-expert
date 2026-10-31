@@ -16,6 +16,19 @@ it('loads the real Reclaim and EAS modules and builds an attester', async () => 
     EAS_ADDRESS: `0x${'3'.repeat(40)}`,
     SCHEMA_UID: `0x${'4'.repeat(64)}`,
   });
-  assert.equal(typeof easAttester(config).attest, 'function');
+  assert.equal(typeof easAttester(config)?.attest, 'function');
   assert.equal(typeof reclaimClient(config).verify, 'function');
+});
+
+it('runs verify-only when EAS settings are empty', async () => {
+  const { loadConfig } = await import('../src/config.js');
+  const { easAttester } = await import('../src/eas.js');
+  const config = loadConfig({
+    RECLAIM_APP_ID: 'app',
+    RECLAIM_APP_SECRET: `0x${'1'.repeat(64)}`,
+    RECLAIM_PROVIDER_ID: 'provider',
+    ATTESTER_PRIVATE_KEY: '0x',
+    RPC_URL: '',
+  });
+  assert.equal(easAttester(config), null);
 });

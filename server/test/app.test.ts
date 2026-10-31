@@ -223,3 +223,20 @@ describe('wallet ownership', () => {
     assert.equal((await post('/session', { wallet: 'x' })).status, 400);
   });
 });
+
+describe('verify-only mode (no EAS)', () => {
+  it('verifies the proof and reports the claim without attesting', async () => {
+    app = createApp({ config, reclaim, attester: null, store: new Store(null), log: () => {} });
+    const { wallet, sessionId } = await startSession();
+    pendingProof[sessionId] = { wallet: wallet.address };
+    assert.deepEqual(await finish(sessionId), { status: 'verified', claim: 'contributions>=10' });
+    assert.equal(attestCalls.length, 0);
+  });
+
+  it('still rejects a proof bound to a different wallet', async () => {
+    app = createApp({ config, reclaim, attester: null, store: new Store(null), log: () => {} });
+    const { sessionId } = await startSession();
+    pendingProof[sessionId] = { wallet: Wallet.createRandom().address };
+    assert.deepEqual(await finish(sessionId), { status: 'failed', error: 'proof is bound to a different wallet' });
+  });
+});

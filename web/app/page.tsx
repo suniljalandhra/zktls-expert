@@ -23,8 +23,8 @@ export default function Home() {
       <header className="intro">
         <h1>Prove your GitHub expertise</h1>
         <p>
-          Sign in to GitHub through Reclaim. We check the proof and record the result on Sepolia as an attestation
-          to your wallet. Your GitHub password and session never reach us.
+          Sign in to GitHub through Reclaim. Our server checks the zkTLS proof and shows you the verified result. Your
+          GitHub password and session never reach us.
         </p>
       </header>
 
@@ -35,7 +35,7 @@ export default function Home() {
         <Step n={2} title="Verify with GitHub" current={step} summary={done && describeClaim(done.claim)}>
           {address && <Verify wallet={address} flow={flow} setFlow={setFlow} />}
         </Step>
-        <Step n={3} title="Your attestation" current={step}>
+        <Step n={3} title="Your verified claim" current={step}>
           {done && address && <Result result={done} wallet={address} />}
         </Step>
       </ol>

@@ -18,11 +18,12 @@ export interface Attester {
   attest(input: AttestInput): Promise<AttestOutput>;
 }
 
-export function easAttester(config: Config): Attester {
-  if (!config.SCHEMA_UID) throw new Error('SCHEMA_UID is not set: run the schema registration script first');
-  const schemaUID = config.SCHEMA_UID;
-  const signer = new Wallet(config.ATTESTER_PRIVATE_KEY, new JsonRpcProvider(config.RPC_URL));
-  const eas = new EAS(config.EAS_ADDRESS);
+// Returns null when EAS isn't configured: the server then verifies proofs without attesting.
+export function easAttester(config: Config): Attester | null {
+  const { SCHEMA_UID: schemaUID, ATTESTER_PRIVATE_KEY: key, RPC_URL: rpc, EAS_ADDRESS: easAddress } = config;
+  if (!schemaUID || !key || !rpc || !easAddress) return null;
+  const signer = new Wallet(key, new JsonRpcProvider(rpc));
+  const eas = new EAS(easAddress);
   eas.connect(signer);
   const encoder = new SchemaEncoder(SCHEMA);
 

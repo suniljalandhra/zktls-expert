@@ -1,8 +1,11 @@
 # zktls-expert
 
 Prove a GitHub fact (an account, or a contribution count above a threshold) straight from github.com with a
-**Reclaim Protocol zkTLS proof**, and receive an **EAS attestation** on Sepolia in your wallet. Built for Fai's
-expert verification: the platform reads the attestation instead of trusting a self-reported profile.
+**Reclaim Protocol zkTLS proof**. The server verifies the proof and the browser shows the verified claim.
+Built for Fai's expert verification: a checked proof instead of a self-reported profile.
+
+**Default: verify-only.** Nothing is written on-chain and no attester wallet or ETH is needed. Optionally, fill
+in the EAS settings and the server also issues an **EAS attestation** on Sepolia to the user's wallet.
 
 No credentials are shared. The user logs into GitHub inside the Reclaim flow; Reclaim's attestors witness the
 TLS session and sign only the extracted values.
@@ -45,18 +48,16 @@ Requirements: Node 24+, a browser wallet, a phone with a camera (or open the lin
 
 1. **Reclaim app.** At [dev.reclaimprotocol.org](https://dev.reclaimprotocol.org/), create an app and add a
    GitHub provider. Note the app ID, app secret and provider ID.
-2. **Config.** `cp .env.example .env` and fill in the Reclaim values. Generate an attester key (any fresh
-   Sepolia-only key) and send it a little Sepolia ETH; `npm --prefix scripts run attester-address` prints the
-   address and balance.
+2. **Config.** `cp .env.example .env` and fill in the three Reclaim values. Leave the EAS block empty.
 3. **Install.**
    ```bash
-   npm --prefix server ci && npm --prefix web ci && npm --prefix scripts ci
+   npm --prefix server ci && npm --prefix web ci
    ```
-4. **Register the schema** (once) and paste the printed `SCHEMA_UID` into `.env`:
+4. **Optional, on-chain attestation.** Fill `ATTESTER_PRIVATE_KEY` (a fresh Sepolia-only key with a little
+   test ETH), `RPC_URL` and `EAS_ADDRESS`, then register the schema once and paste the printed `SCHEMA_UID`:
    ```bash
-   npm --prefix scripts run register-schema
+   npm --prefix scripts ci && npm --prefix scripts run register-schema
    ```
-   Without `SCHEMA_UID` the server still verifies proofs, it just doesn't attest. Useful for a first run.
 5. **Start both.**
    ```bash
    npm --prefix server run dev
@@ -89,7 +90,7 @@ Tests (fake Reclaim + EAS, covers every attack path): `npm --prefix server test`
 - `subjectHash` is `keccak(username)`: GitHub usernames are public, so anyone can test whether a given
   username is attested. It hides the username from casual reads, not from a determined one.
 - Only EOAs can sign the challenge (no EIP-1271 smart-contract wallets).
-- One attestation per GitHub account, forever. No re-verification or update flow; revoking is manual.
+- With EAS enabled: one attestation per GitHub account, forever, and revoking is manual. In verify-only mode nothing persists beyond the session, so the verified claim exists only in the browser and server log.
 - No rate limiting on `/challenge` or `/session`; each session calls Reclaim's API.
 - The claim rule is a single username field plus an optional numeric threshold.
 

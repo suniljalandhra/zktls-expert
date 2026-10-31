@@ -7,9 +7,8 @@ import { Store } from './store.js';
 
 const config = loadConfig();
 
-// Without SCHEMA_UID the server still verifies proofs (Phase 1 mode) but doesn't attest.
-const attester = config.SCHEMA_UID ? easAttester(config) : null;
-if (!attester) console.warn('SCHEMA_UID not set: proofs will be verified but not attested');
+const attester = easAttester(config);
+console.log(attester ? 'EAS attestation enabled' : 'Verify-only mode: proofs are checked, nothing is written on-chain');
 
 const app = createApp({ config, reclaim: reclaimClient(config), attester, store: new Store(config.STORE_PATH) });
 

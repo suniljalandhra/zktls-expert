@@ -14,7 +14,7 @@ const SESSION_TTL_MS = 15 * 60 * 1000;
 type Status =
   | { status: 'pending' }
   | { status: 'verifying' }
-  | { status: 'verified'; claim: string } // proof accepted, attestation disabled (no SCHEMA_UID)
+  | { status: 'verified'; claim: string } // proof accepted, verify-only mode (EAS not configured)
   | { status: 'attested'; claim: string; uid: string; txHash: string; explorerUrl: string }
   | { status: 'failed'; error: string };
 

@@ -40,7 +40,7 @@ export function ConnectWallet() {
   }
   return (
     <div className="stack">
-      <p className="hint">The attestation is issued to this address.</p>
+      <p className="hint">Your GitHub proof is bound to this address.</p>
       <div className="row">
         {connectors.map((connector) => (
           <button key={connector.uid} className="btn" disabled={isPending} onClick={() => connect({ connector })}>
@@ -105,7 +105,7 @@ export function Verify(props: { wallet: string; flow: Flow; setFlow: (f: Flow) =
         </div>
         <p className="status" role="status" aria-live="polite">
           <span className="pulse" aria-hidden="true" />
-          {checking ? 'Proof received. Checking it and writing your attestation…' : 'Waiting for you to finish in Reclaim…'}
+          {checking ? 'Proof received. Checking it…' : 'Waiting for you to finish in Reclaim…'}
         </p>
         {!checking && (
           <button className="link" onClick={() => setFlow({ kind: 'idle' })}>
@@ -142,7 +142,7 @@ export function Result({ result, wallet }: { result: Done; wallet: string }) {
       <div className="credential-body">
         <p className="credential-claim">{describeClaim(result.claim)}</p>
         <dl className="credential-facts">
-          <dt>Issued to</dt>
+          <dt>Wallet</dt>
           <dd>
             <Mono>{short(wallet)}</Mono>
           </dd>
@@ -162,9 +162,7 @@ export function Result({ result, wallet }: { result: Done; wallet: string }) {
             View on EAS Scan
           </a>
         ) : (
-          <p className="hint">
-            Proof verified. No attestation was written because the server has no schema configured yet.
-          </p>
+          <p className="hint">Checked by our server against the attestor signatures. Nothing was written on-chain.</p>
         )}
       </div>
     </article>
