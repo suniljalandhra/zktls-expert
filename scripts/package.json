@@ -1,0 +1,16 @@
+{
+  "name": "zktls-expert-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "register-schema": "tsx --env-file=../.env register-schema.ts",
+    "attester-address": "tsx --env-file=../.env attester-address.ts"
+  },
+  "dependencies": {
+    "@ethereum-attestation-service/eas-sdk": "2.10.0",
+    "ethers": "6.17.0"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15"
+  }
+}
