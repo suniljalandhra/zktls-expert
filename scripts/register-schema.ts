@@ -1,6 +1,11 @@
-import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
+import { createRequire } from 'node:module';
 import { JsonRpcProvider, Wallet, ZeroAddress } from 'ethers';
 import { SCHEMA } from '../server/src/eas.ts';
+
+// CommonJS build: the SDK's ESM build has a broken named import from lodash under Node ESM.
+const { SchemaRegistry } = createRequire(import.meta.url)(
+  '@ethereum-attestation-service/eas-sdk',
+) as typeof import('@ethereum-attestation-service/eas-sdk');
 
 // Registers the attestation schema once and prints SCHEMA_UID for .env. Safe to re-run:
 // the UID is deterministic, so if it's already registered we just print it.

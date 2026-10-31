@@ -1,6 +1,12 @@
-import { EAS, NO_EXPIRATION, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
+import { createRequire } from 'node:module';
 import { JsonRpcProvider, Wallet } from 'ethers';
 import type { Config } from './config.js';
+
+// The SDK's ESM build does `import { isEqual } from 'lodash'`, which Node's ESM loader rejects (lodash is CJS),
+// so the server crashes on boot. Load the CommonJS build instead; types still come from the package.
+const { EAS, NO_EXPIRATION, SchemaEncoder } = createRequire(import.meta.url)(
+  '@ethereum-attestation-service/eas-sdk',
+) as typeof import('@ethereum-attestation-service/eas-sdk');
 
 // Must match scripts/register-schema.ts exactly, or the schema UID won't line up.
 export const SCHEMA = 'string platform,bytes32 subjectHash,string claim,uint64 verifiedAt,string method';
