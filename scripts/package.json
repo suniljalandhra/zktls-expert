@@ -4,9 +4,13 @@
   "type": "module",
   "scripts": {
     "register-schema": "tsx --env-file=../.env register-schema.ts",
-    "attester-address": "tsx --env-file=../.env attester-address.ts"
+    "attester-address": "tsx --env-file=../.env attester-address.ts",
+    "chain": "mkdir -p ../.anvil && anvil --chain-id 31337 --state ../.anvil/state.json",
+    "deploy-local": "tsx --env-file=../.env deploy-local.ts",
+    "read-attestation": "tsx --env-file=../.env read-attestation.ts"
   },
   "dependencies": {
+    "@ethereum-attestation-service/eas-contracts": "1.9.0",
     "@ethereum-attestation-service/eas-sdk": "2.10.0",
     "ethers": "6.17.0"
   },

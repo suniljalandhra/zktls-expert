@@ -21,6 +21,7 @@ const config = loadConfig({
   SCHEMA_UID: `0x${'4'.repeat(64)}`,
   CLAIM_COUNT_PARAM: 'contributions',
   CLAIM_MIN_COUNT: '10',
+  EXPLORER_URL: 'https://sepolia.easscan.org',
 });
 
 type ProofSpec = {

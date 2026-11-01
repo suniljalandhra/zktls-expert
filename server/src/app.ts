@@ -15,7 +15,7 @@ type Status =
   | { status: 'pending' }
   | { status: 'verifying' }
   | { status: 'verified'; claim: string } // proof accepted, verify-only mode (EAS not configured)
-  | { status: 'attested'; claim: string; uid: string; txHash: string; explorerUrl: string }
+  | { status: 'attested'; claim: string; uid: string; txHash: string; explorerUrl: string | null }
   | { status: 'failed'; error: string };
 
 type Entry = Session & { state: Status };
@@ -134,7 +134,7 @@ export function createApp(deps: Deps) {
         claim: verified.claim,
         uid,
         txHash,
-        explorerUrl: `${config.EXPLORER_URL}/attestation/view/${uid}`,
+        explorerUrl: config.EXPLORER_URL ? `${config.EXPLORER_URL}/attestation/view/${uid}` : null,
       };
     } catch (e) {
       if (reservedSubject) store.release(reservedSubject);

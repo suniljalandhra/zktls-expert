@@ -7,7 +7,7 @@ export type SessionState =
   | { status: 'pending' }
   | { status: 'verifying' }
   | { status: 'verified'; claim: string }
-  | { status: 'attested'; claim: string; uid: string; txHash: string; explorerUrl: string }
+  | { status: 'attested'; claim: string; uid: string; txHash: string; explorerUrl: string | null }
   | { status: 'failed'; error: string };
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {

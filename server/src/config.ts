@@ -18,7 +18,8 @@ const Env = z.object({
   RPC_URL: z.preprocess(empty, z.string().url().optional()),
   EAS_ADDRESS: z.preprocess(empty, z.string().regex(hex(20)).optional()),
   SCHEMA_UID: z.preprocess(empty, z.string().regex(hex(32)).optional()),
-  EXPLORER_URL: z.string().url().default('https://sepolia.easscan.org'),
+  // EAS Scan base URL for result links. Empty for a local chain, which no explorer can see.
+  EXPLORER_URL: z.preprocess(empty, z.string().url().optional()),
   // Claim rule: which extracted parameter holds the GitHub login, and an optional numeric threshold.
   GITHUB_USERNAME_PARAM: z.string().min(1).default('username'),
   CLAIM_COUNT_PARAM: optionalString,

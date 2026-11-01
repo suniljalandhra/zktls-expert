@@ -4,8 +4,9 @@ Prove a GitHub fact (an account, or a contribution count above a threshold) stra
 **Reclaim Protocol zkTLS proof**. The server verifies the proof and the browser shows the verified claim.
 Built for Fai's expert verification: a checked proof instead of a self-reported profile.
 
-**Default: verify-only.** Nothing is written on-chain and no attester wallet or ETH is needed. Optionally, fill
-in the EAS settings and the server also issues an **EAS attestation** on Sepolia to the user's wallet.
+The server then issues an **EAS attestation** to the user's wallet on a **local Anvil chain**: EAS's own
+contracts deployed locally, no testnet, no faucet, no real ETH. Leave the EAS settings empty for verify-only
+mode (nothing on-chain), or point them at Sepolia for a public attestation.
 
 No credentials are shared. The user logs into GitHub inside the Reclaim flow; Reclaim's attestors witness the
 TLS session and sign only the extracted values.
@@ -48,15 +49,19 @@ Requirements: Node 24+, a browser wallet, a phone with a camera (or open the lin
 
 1. **Reclaim app.** At [dev.reclaimprotocol.org](https://dev.reclaimprotocol.org/), create an app and add a
    GitHub provider. Note the app ID, app secret and provider ID.
-2. **Config.** `cp .env.example .env` and fill in the three Reclaim values. Leave the EAS block empty.
-3. **Install.**
+2. **Config.** `cp .env.example .env`, fill in the three Reclaim values, and set `ATTESTER_PRIVATE_KEY` to any
+   fresh key (the deploy script funds it on the local chain). `RPC_URL` already points at Anvil.
+3. **Install** (needs [Foundry](https://getfoundry.sh/) for `anvil`).
    ```bash
-   npm --prefix server ci && npm --prefix web ci
+   npm --prefix server ci && npm --prefix web ci && npm --prefix scripts ci
    ```
-4. **Optional, on-chain attestation.** Fill `ATTESTER_PRIVATE_KEY` (a fresh Sepolia-only key with a little
-   test ETH), `RPC_URL` and `EAS_ADDRESS`, then register the schema once and paste the printed `SCHEMA_UID`:
+4. **Local chain.** Start Anvil in its own terminal and leave it running. State is saved to `.anvil/` on exit.
    ```bash
-   npm --prefix scripts ci && npm --prefix scripts run register-schema
+   npm --prefix scripts run chain
+   ```
+   Then deploy EAS + register the schema (safe to re-run) and paste the three printed values into `.env`:
+   ```bash
+   npm --prefix scripts run deploy-local
    ```
 5. **Start both.**
    ```bash
@@ -70,6 +75,19 @@ Requirements: Node 24+, a browser wallet, a phone with a camera (or open the lin
    count differently, set `GITHUB_USERNAME_PARAM` / `CLAIM_COUNT_PARAM` / `CLAIM_MIN_COUNT` to match.
 
 Tests (fake Reclaim + EAS, covers every attack path): `npm --prefix server test`
+
+On-chain integration test (real attester on the running local chain, reads the attestation back):
+`npm --prefix server run test:local`
+
+Read any attestation from the local chain (stand-in for EAS Scan):
+`npm --prefix scripts run read-attestation -- <uid>`
+
+Reset everything: stop Anvil, then delete `.anvil/` **and** `server/data/` together. The server's
+one-per-account store must match the chain, or it will block accounts whose attestations no longer exist.
+
+**Sepolia instead of local:** set `RPC_URL` to a Sepolia RPC, `EAS_ADDRESS=0xC2679fBD37d54388Ce493F1DB75320D236e1815e`,
+`SCHEMA_REGISTRY_ADDRESS=0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0`, `EXPLORER_URL=https://sepolia.easscan.org`,
+fund the attester, and run `npm --prefix scripts run register-schema`.
 
 ## Trust model
 

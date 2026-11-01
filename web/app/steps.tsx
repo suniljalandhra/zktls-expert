@@ -157,12 +157,17 @@ export function Result({ result, wallet }: { result: Done; wallet: string }) {
             </>
           )}
         </dl>
-        {result.status === 'attested' ? (
+        {result.status === 'verified' ? (
+          <p className="hint">Checked by our server against the attestor signatures. Nothing was written on-chain.</p>
+        ) : result.explorerUrl ? (
           <a className="btn" href={result.explorerUrl} target="_blank" rel="noopener noreferrer">
             View on EAS Scan
           </a>
         ) : (
-          <p className="hint">Checked by our server against the attestor signatures. Nothing was written on-chain.</p>
+          <p className="hint">
+            Recorded on the local development chain in transaction <Mono>{short(result.txHash)}</Mono>. No public
+            explorer can see it.
+          </p>
         )}
       </div>
     </article>
