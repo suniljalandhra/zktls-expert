@@ -8,3 +8,6 @@ next-env.d.ts
 !.env.example
 server/data/
 .anvil/
+.claude/
+CLAUDE.md
+AGENTS.md
